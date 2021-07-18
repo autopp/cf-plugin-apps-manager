@@ -35,7 +35,7 @@ func NewAppsManagerPlugin(b Browser, v Version) *AppsManagerPlugin {
 
 func (p *AppsManagerPlugin) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
-		Name:    "AppsManager",
+		Name:    "apps-manager",
 		Version: plugin.VersionType(p.version),
 		Commands: []plugin.Command{
 			{
