@@ -47,5 +47,9 @@ func (p *AppsManagerPlugin) GetMetadata() plugin.PluginMetadata {
 }
 
 func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []string) {
+	if args[0] == "CLI-MESSAGE-UNINSTALL" {
+		return
+	}
+
 	p.browser.Open("http://www.google.com")
 }
