@@ -26,7 +26,7 @@ type AppsManagerPlugin struct {
 }
 
 type Browser interface {
-	Open(url string)
+	Open(url string) error
 }
 
 func NewAppsManagerPlugin(b Browser, v Version) *AppsManagerPlugin {
@@ -47,4 +47,5 @@ func (p *AppsManagerPlugin) GetMetadata() plugin.PluginMetadata {
 }
 
 func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []string) {
+	p.browser.Open("http://www.google.com")
 }

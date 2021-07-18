@@ -15,33 +15,20 @@
 package main
 
 import (
-	"code.cloudfoundry.org/cli/plugin"
+	cf "code.cloudfoundry.org/cli/plugin"
+	"github.com/autopp/cf-plugin-apps-manager/pkg/browser"
+	"github.com/autopp/cf-plugin-apps-manager/pkg/plugin"
 )
 
 var version = "HEAD"
 
 type AppsManagerPlugin struct{}
 
-func (*AppsManagerPlugin) GetMetadata() plugin.PluginMetadata {
-	return plugin.PluginMetadata{
-		Name: "AppsManager",
-		Version: plugin.VersionType{
-			Major: 0,
-			Minor: 1,
-			Build: 0,
-		},
-		Commands: []plugin.Command{
-			{
-				Name:     "apps-manager",
-				HelpText: "Open AppsManager in browser",
-			},
-		},
-	}
-}
-
-func (*AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []string) {
-}
-
 func main() {
-	plugin.Start(&AppsManagerPlugin{})
+	b := browser.New()
+	cf.Start(plugin.NewAppsManagerPlugin(b, plugin.Version{
+		Major: 0,
+		Minor: 1,
+		Build: 0,
+	}))
 }
