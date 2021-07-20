@@ -26,9 +26,5 @@ type AppsManagerPlugin struct{}
 
 func main() {
 	b := browser.New()
-	cf.Start(plugin.NewAppsManagerPlugin(b, plugin.Version{
-		Major: 0,
-		Minor: 1,
-		Build: 0,
-	}))
+	cf.Start(plugin.NewAppsManagerPlugin(b, version))
 }

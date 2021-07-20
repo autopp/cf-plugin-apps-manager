@@ -15,28 +15,29 @@
 package plugin
 
 import (
+	"regexp"
+	"strconv"
+
 	"code.cloudfoundry.org/cli/plugin"
 )
 
-type Version plugin.VersionType
-
 type AppsManagerPlugin struct {
 	browser Browser
-	version Version
+	version *plugin.VersionType
 }
 
 type Browser interface {
 	Open(url string) error
 }
 
-func NewAppsManagerPlugin(b Browser, v Version) *AppsManagerPlugin {
-	return &AppsManagerPlugin{browser: b, version: v}
+func NewAppsManagerPlugin(b Browser, v string) *AppsManagerPlugin {
+	return &AppsManagerPlugin{browser: b, version: parseVersion(v)}
 }
 
 func (p *AppsManagerPlugin) GetMetadata() plugin.PluginMetadata {
 	return plugin.PluginMetadata{
 		Name:    "apps-manager",
-		Version: plugin.VersionType(p.version),
+		Version: *p.version,
 		Commands: []plugin.Command{
 			{
 				Name:     "apps-manager",
@@ -52,4 +53,21 @@ func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []strin
 	}
 
 	p.browser.Open("http://www.google.com")
+}
+
+var versionPattern = regexp.MustCompile(`\Av(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\z`)
+
+func parseVersion(v string) *plugin.VersionType {
+	var major, minor, build int
+	if versionNums := versionPattern.FindStringSubmatch(v); versionNums != nil {
+		major, _ = strconv.Atoi(versionNums[1])
+		minor, _ = strconv.Atoi(versionNums[2])
+		build, _ = strconv.Atoi(versionNums[3])
+	}
+
+	return &plugin.VersionType{
+		Major: major,
+		Minor: minor,
+		Build: build,
+	}
 }
