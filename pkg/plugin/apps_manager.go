@@ -15,10 +15,13 @@
 package plugin
 
 import (
+	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"code.cloudfoundry.org/cli/plugin"
 )
@@ -60,7 +63,59 @@ func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []strin
 		return
 	}
 
-	p.browser.Open("http://www.google.com")
+	if ok, err := cliConnection.HasAPIEndpoint(); err != nil {
+		p.setErr("Cannot check current API endpoint: %w", err)
+		return
+	} else if !ok {
+		p.setErr("No API endpoint set")
+		return
+	}
+
+	apiEndpoint, err := cliConnection.ApiEndpoint()
+	if err != nil {
+		p.setErr("Cannot get API endpoint: %w", err)
+		return
+	}
+
+	apiURL, err := url.Parse(apiEndpoint)
+	if err != nil {
+		p.setErr("Cannot parse API endpoint URL: %w", err)
+		return
+	}
+
+	amEndpoint := fmt.Sprintf("%s://apps%s", apiURL.Scheme, apiURL.Host[strings.IndexRune(apiURL.Host, '.'):])
+
+	if ok, err := cliConnection.HasOrganization(); err != nil {
+		p.setErr("Cannot check current organization: %w", err)
+	} else if !ok {
+		p.browser.Open(amEndpoint)
+		return
+	}
+
+	org, err := cliConnection.GetCurrentOrg()
+	if err != nil {
+		p.setErr("Cannot get current organization: %w", err)
+		return
+	}
+	orgURL := fmt.Sprintf("%s/organizations/%s", amEndpoint, org.Guid)
+
+	if ok, err := cliConnection.HasSpace(); err != nil {
+		p.setErr("Cannot check current space: %w", err)
+		return
+	} else if !ok {
+		p.browser.Open(orgURL)
+		return
+	}
+
+	space, err := cliConnection.GetCurrentSpace()
+	if err != nil {
+		p.setErr("Cannot get current space: %w", err)
+		return
+	}
+
+	spaceURL := fmt.Sprintf("%s/spaces/%s", orgURL, space.Guid)
+
+	p.browser.Open(spaceURL)
 }
 
 var versionPattern = regexp.MustCompile(`\Av(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\z`)
@@ -82,4 +137,8 @@ func parseVersion(v string) *plugin.VersionType {
 
 func (p *AppsManagerPlugin) Err() error {
 	return p.err
+}
+
+func (p *AppsManagerPlugin) setErr(format string, a ...interface{}) {
+	p.err = fmt.Errorf(format, a...)
 }
