@@ -30,9 +30,9 @@ var _ = Describe("AppsManager", func() {
 			p := NewAppsManagerPlugin(WithBrowser(b), WithVersion(v))
 			Expect(p.GetMetadata().Version).To(Equal(plugin.VersionType{Major: major, Minor: minor, Build: build}))
 		},
-		Entry(`"v1.2.3" -> (1, 2, 3)`, "v1.2.3", 1, 2, 3),
+		Entry(`"1.2.3" -> (1, 2, 3)`, "1.2.3", 1, 2, 3),
 		Entry(`"" -> (0, 0, 0)`, "", 0, 0, 0),
-		Entry(`"v1.a.2" -> (0, 0, 0)`, "", 0, 0, 0),
+		Entry(`"1.a.2" -> (0, 0, 0)`, "1.a.2", 0, 0, 0),
 	)
 
 	apiEndpoint := "https://api.cf.example.com"

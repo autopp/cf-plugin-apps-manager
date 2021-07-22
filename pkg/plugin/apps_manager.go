@@ -118,7 +118,7 @@ func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []strin
 	p.open(spaceURL)
 }
 
-var versionPattern = regexp.MustCompile(`\Av(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\z`)
+var versionPattern = regexp.MustCompile(`\A(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\z`)
 
 func parseVersion(v string) *plugin.VersionType {
 	var major, minor, build int
