@@ -15,6 +15,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	cf "code.cloudfoundry.org/cli/plugin"
 	"github.com/autopp/cf-plugin-apps-manager/pkg/browser"
 	"github.com/autopp/cf-plugin-apps-manager/pkg/plugin"
@@ -26,5 +29,11 @@ type AppsManagerPlugin struct{}
 
 func main() {
 	b := browser.New()
-	cf.Start(plugin.NewAppsManagerPlugin(plugin.WithBrowser(b), plugin.WithVersion(version)))
+	p := plugin.NewAppsManagerPlugin(plugin.WithBrowser(b), plugin.WithVersion(version))
+	cf.Start(p)
+
+	if err := p.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %s\n", err.Error())
+		os.Exit(1)
+	}
 }
