@@ -12,8 +12,10 @@ import (
 
 var _ = Describe("AppsManager", func() {
 	var ctrl *gomock.Controller
+	var b *mock.MockBrowser
 	JustBeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
+		b = mock.NewMockBrowser(ctrl)
 	})
 
 	JustAfterEach(func() {
@@ -22,8 +24,7 @@ var _ = Describe("AppsManager", func() {
 
 	DescribeTable("GetMetadata",
 		func(v string, major, minor, build int) {
-			b := mock.NewMockBrowser(ctrl)
-			p := NewAppsManagerPlugin(b, v)
+			p := NewAppsManagerPlugin(WithBrowser(b), WithVersion(v))
 			Expect(p.GetMetadata().Version).To(Equal(plugin.VersionType{Major: major, Minor: minor, Build: build}))
 		},
 		Entry(`"v1.2.3" -> (1, 2, 3)`, "v1.2.3", 1, 2, 3),

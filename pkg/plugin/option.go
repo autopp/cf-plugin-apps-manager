@@ -12,19 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package plugin
 
-import (
-	cf "code.cloudfoundry.org/cli/plugin"
-	"github.com/autopp/cf-plugin-apps-manager/pkg/browser"
-	"github.com/autopp/cf-plugin-apps-manager/pkg/plugin"
-)
+import "io"
 
-var version = "HEAD"
+type Option func(p *AppsManagerPlugin)
 
-type AppsManagerPlugin struct{}
+func WithBrowser(b Browser) Option {
+	return func(p *AppsManagerPlugin) {
+		p.browser = b
+	}
+}
 
-func main() {
-	b := browser.New()
-	cf.Start(plugin.NewAppsManagerPlugin(plugin.WithBrowser(b), plugin.WithVersion(version)))
+func WithVersion(v string) Option {
+	return func(p *AppsManagerPlugin) {
+		p.version = parseVersion(v)
+	}
+}
+
+func WithStdout(w io.Writer) Option {
+	return func(p *AppsManagerPlugin) {
+		p.stdout = w
+	}
 }

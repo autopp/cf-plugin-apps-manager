@@ -15,6 +15,8 @@
 package plugin
 
 import (
+	"io"
+	"os"
 	"regexp"
 	"strconv"
 
@@ -24,14 +26,20 @@ import (
 type AppsManagerPlugin struct {
 	browser Browser
 	version *plugin.VersionType
+	stdout  io.Writer
+	err     error
 }
 
 type Browser interface {
 	Open(url string) error
 }
 
-func NewAppsManagerPlugin(b Browser, v string) *AppsManagerPlugin {
-	return &AppsManagerPlugin{browser: b, version: parseVersion(v)}
+func NewAppsManagerPlugin(opts ...Option) *AppsManagerPlugin {
+	p := &AppsManagerPlugin{}
+	for _, o := range append([]Option{WithStdout(os.Stdout)}, opts...) {
+		o(p)
+	}
+	return p
 }
 
 func (p *AppsManagerPlugin) GetMetadata() plugin.PluginMetadata {
@@ -70,4 +78,8 @@ func parseVersion(v string) *plugin.VersionType {
 		Minor: minor,
 		Build: build,
 	}
+}
+
+func (p *AppsManagerPlugin) Err() error {
+	return p.err
 }
