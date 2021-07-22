@@ -36,4 +36,5 @@ jobs:
         else
           echo "Delete ${VERSION}"
           gh release delete "${VERSION}"
+          git push origin :"${VERSION}"
         fi
