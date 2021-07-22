@@ -35,6 +35,8 @@ func (*Browser) Open(url string) error {
 		browserCmd = []string{"cmd", "/c", "start"}
 	case "darwin":
 		browserCmd = []string{"open"}
+	case "linux":
+		browserCmd = []string{"xdg-open"}
 	default:
 		return fmt.Errorf("unsupported os: %s", runtime.GOOS)
 	}
