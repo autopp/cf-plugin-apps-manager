@@ -88,7 +88,7 @@ func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []strin
 	if ok, err := cliConnection.HasOrganization(); err != nil {
 		p.setErr("Cannot check current organization: %w", err)
 	} else if !ok {
-		p.browser.Open(amEndpoint)
+		p.open(amEndpoint)
 		return
 	}
 
@@ -103,7 +103,7 @@ func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []strin
 		p.setErr("Cannot check current space: %w", err)
 		return
 	} else if !ok {
-		p.browser.Open(orgURL)
+		p.open(orgURL)
 		return
 	}
 
@@ -115,7 +115,7 @@ func (p *AppsManagerPlugin) Run(cliConnection plugin.CliConnection, args []strin
 
 	spaceURL := fmt.Sprintf("%s/spaces/%s", orgURL, space.Guid)
 
-	p.browser.Open(spaceURL)
+	p.open(spaceURL)
 }
 
 var versionPattern = regexp.MustCompile(`\Av(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)\z`)
@@ -141,4 +141,9 @@ func (p *AppsManagerPlugin) Err() error {
 
 func (p *AppsManagerPlugin) setErr(format string, a ...interface{}) {
 	p.err = fmt.Errorf(format, a...)
+}
+
+func (p *AppsManagerPlugin) open(url string) {
+	fmt.Fprintln(p.stdout, url)
+	p.browser.Open(url)
 }

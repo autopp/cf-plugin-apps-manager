@@ -1,6 +1,8 @@
 package plugin
 
 import (
+	"bytes"
+
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
@@ -70,15 +72,19 @@ var _ = Describe("AppsManager", func() {
 				b.EXPECT().Open(expectedURL).Times(1).Return(nil)
 			}
 
+			stdout := new(bytes.Buffer)
+
 			// Act
-			p := NewAppsManagerPlugin(WithBrowser(b), WithVersion("v0.1.0"))
+			p := NewAppsManagerPlugin(WithBrowser(b), WithVersion("v0.1.0"), WithStdout(stdout))
 			p.Run(cliConnection, []string{"apps-manager"})
 
 			// Assert
 			if expectedURL != "" {
 				Expect(p.Err()).NotTo(HaveOccurred())
+				Expect(stdout.String()).To(Equal(expectedURL + "\n"))
 			} else {
 				Expect(p.Err()).To(HaveOccurred())
+				Expect(stdout.String()).To(BeEmpty())
 			}
 		},
 		Entry(`org and space are set -> open the space URL`,
